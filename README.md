@@ -1,1 +1,1 @@
-Repository for some typical interview questions
+# 0x00. C - malloc
