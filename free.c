@@ -6,5 +6,11 @@
  */
 void _free(void *ptr)
 {
-	;
+	void *headptr;
+
+	if (ptr)
+	{
+		headptr = (void *)((char *)(ret_ptr) - aligner(sizeof(size_t)));
+		*headptr = *headptr & ~1L; /* bitmask to clear all bits */
+	}
 }

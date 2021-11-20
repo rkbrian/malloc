@@ -22,12 +22,12 @@ Build the naive malloc that is presented in the concept page (can not be linkd h
  - - Allocate memory pages only
 
 ### 1. malloc
-Write you own malloc function that allocates space in the heap
+Write your own malloc function that allocates space in the heap
  - Prototype: void *_malloc(size_t size);
  - Where size is the size needed to be allocated for the user
  - Your function must return a pointer to the allocated memory that is suitably aligned for any kind of variable
 
 ### 2. free
-Write you own free function that frees a memory space
+Write your own free function that frees a memory space
  - Prototype: void _free(void *ptr);
  - Where ptr is a pointer to the memory space to be freed
