@@ -2,6 +2,7 @@
 #define MALLOC_H
 
 #include <unistd.h>
+#include <string.h>
 
 /**
  *

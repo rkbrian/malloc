@@ -10,7 +10,7 @@ void _free(void *ptr)
 
 	if (ptr)
 	{
-		headptr = (void *)((char *)(ret_ptr) - aligner(sizeof(size_t)));
-		*headptr = *headptr & ~1L; /* bitmask to clear all bits */
+		headptr = (void *)((char *)(ptr) - aligner(sizeof(size_t)));
+		headptr = (void *)((long int)headptr & ~1L); /* bitmask to clear all bits */
 	}
 }
