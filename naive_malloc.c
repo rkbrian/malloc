@@ -18,15 +18,17 @@ void *naive_malloc(size_t size)
 		return (NULL);
 	while (new_alloc < chunk_hdr)
 	{
-		if (headptr == NULL)
-			page_size = sysconf(_SC_PAGESIZE), headptr = sbrk(page_size);
-		else
+		if (headptr)
 			sbrk(page_size);
+		else
+			page_size = sysconf(_SC_PAGESIZE), headptr = sbrk(page_size);
 		new_alloc = new_alloc + page_size;
 	}
 	ret_ptr = headptr;
 	memcpy(ret_ptr, &chunk_hdr, sizeof(chunk_hdr));
-	headptr = (void *)((char *)(ret_ptr) + chunk_hdr);
+	ret_ptr = *((size_t *)(ret_ptr)) |= 1; /* need to touble check later */
+	headptr = (void *)((char *)(ret_ptr) + sizeof(ret_ptr));
+	new_alloc = new_alloc - page_size;
 	return ((void *)((char *)(ret_ptr) + aligner(sizeof(chunk_hdr))));
 }
 
