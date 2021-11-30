@@ -16,7 +16,7 @@ void *_malloc(size_t size)
 
 	if (!size)
 		return (NULL);
-	if (chunk_hdr <= )
+	if (chunk_hdr <= local_max)
 		return (????);
 	while (new_alloc < chunk_hdr)
 	{
@@ -37,7 +37,9 @@ void *_malloc(size_t size)
 	}
 	ret_ptr = headptr;
 	memcpy(ret_ptr, &chunk_hdr, sizeof(chunk_hdr));
-	headptr = (void *)((char *)(ret_ptr) + chunk_hdr);
+	ret_ptr = *((size_t *)(ret_ptr)) |= 1; /* need to touble check later */
+	headptr = (void *)((char *)(ret_ptr) + sizeof(ret_ptr));
+	new_alloc = new_alloc - page_size;
 	return ((void *)((char *)(ret_ptr) + aligner(sizeof(chunk_hdr))));
 }
 
@@ -50,4 +52,32 @@ size_t aligner(size_t size)
 {
 	/* mask everything before composites of 8 */
 	return ((8 - 1 + size) & ~(8 - 1));
+}
+
+size_t local_max = 0;
+
+/**
+ * fit_chunk - find the best fit of heap chunk for allocation 
+ * @csize: chunk size to fit into the heap
+ * @ret_ptr: ptr to the allocated memory, to be returned in main malloc func
+ * Return: pointer to the best fit, which is >= the given chunk size
+ */
+void *fit_chunk(size_t csize, void *ret_ptr)
+{
+	size_t fitflag = 0, ptr_size = (*((size_t *)(ret_ptr)) >> 1) << 1;
+	static size_t max_size;
+	void *next_ptr;
+
+	if ((*((size_t *)(ret_ptr)) & 1) == NULL && (csize <= ptr_size))
+	{
+		if (local_max == ptr_size)
+			fitflag = 1;
+		max_size = ptr_size;
+		memcpy(ptr_size, &csize, sizeof(csize));
+		ret_ptr = *((size_t *)(ret_ptr)) |= 1;
+		if (csize < max_size && (max_size - csize) > 8)
+		{
+			next_ptr = ;
+		}
+	}
 }

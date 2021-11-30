@@ -26,9 +26,7 @@ void *naive_malloc(size_t size)
 	}
 	ret_ptr = headptr;
 	memcpy(ret_ptr, &chunk_hdr, sizeof(chunk_hdr));
-	ret_ptr = *((size_t *)(ret_ptr)) |= 1; /* need to touble check later */
-	headptr = (void *)((char *)(ret_ptr) + sizeof(ret_ptr));
-	new_alloc = new_alloc - page_size;
+	headptr = (void *)((char *)(ret_ptr) + chunk_hdr);
 	return ((void *)((char *)(ret_ptr) + aligner(sizeof(chunk_hdr))));
 }
 
