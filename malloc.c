@@ -64,20 +64,42 @@ size_t local_max = 0;
  */
 void *fit_chunk(size_t csize, void *ret_ptr)
 {
-	size_t fitflag = 0, ptr_size = (*((size_t *)(ret_ptr)) >> 1) << 1;
+	size_t fitflag = 0, ptr_size = (*((size_t *)(ret_ptr)) >> 1) << 1, next_size;
 	static size_t max_size;
-	void *next_ptr;
+	void *next_ptr = NULL;
 
 	if ((*((size_t *)(ret_ptr)) & 1) == NULL && (csize <= ptr_size))
 	{
 		if (local_max == ptr_size)
 			fitflag = 1;
-		max_size = ptr_size;
-		memcpy(ptr_size, &csize, sizeof(csize));
+		max_size = ptr_size, memcpy(ptr_size, &csize, sizeof(csize));
 		ret_ptr = *((size_t *)(ret_ptr)) |= 1;
 		if (csize < max_size && (max_size - csize) > 8)
 		{
-			next_ptr = ;
+			next_ptr = (void *)((char *)(ret_ptr) + sizeof(ret_ptr)), max_size -= csize;
+			memcpy(next_ptr, &max_size, sizeof(max_size));
 		}
+		if (fitflag)
+		{
+			if (next_ptr)
+				max_size = (*((size_t *)(next_ptr)) >> 1) << 1;
+			else
+				max_size = 0;
+			next_ptr = (void *)((char *)(ret_ptr) + sizeof(ret_ptr));
+			next_size = (*((size_t *)(next_ptr)) & 1);
+			while (next_size)
+			{
+				if (!(*((size_t *)(next_ptr)) & 1) && next_size > max_size)
+					max_size = next_size;
+				next_ptr = (void *)((char *)(ret_ptr) + sizeof(ret_ptr));
+				next_size = (*((size_t *)(next_ptr)) & 1);
+			}
+			local_max = max_size;
+		}
+		max_size = 0;
+		return ((void *)((char *)(ret_ptr) + aligner(sizeof(size_t))));
 	}
+	if (!(*((size_t *)(ret_ptr)) & 1) && ptr_size > max_size)
+		max_size = ptr_size;
+	return (fit_chunk(csize, (void *)((char *)(ret_ptr) + sizeof(ret_ptr))));
 }
