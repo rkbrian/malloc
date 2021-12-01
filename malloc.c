@@ -1,5 +1,7 @@
 #include "malloc.h"
 
+size_t local_max = 0;
+
 /**
  * _malloc - my own malloc function that allocates space in the heap
  * @size: the size needed to be allocated for the user
@@ -17,7 +19,7 @@ void *_malloc(size_t size)
 	if (!size)
 		return (NULL);
 	if (chunk_hdr <= local_max)
-		return (????);
+		return (fit_chunk(chunk_hdr, headptr));
 	while (new_alloc < chunk_hdr)
 	{
 		if (headptr == NULL)
@@ -35,10 +37,10 @@ void *_malloc(size_t size)
 			return (NULL);
 		new_alloc = new_alloc + page_size;
 	}
-	ret_ptr = headptr;
+	ret_ptr = current;
 	memcpy(ret_ptr, &chunk_hdr, sizeof(chunk_hdr));
-	ret_ptr = *((size_t *)(ret_ptr)) |= 1; /* need to touble check later */
-	headptr = (void *)((char *)(ret_ptr) + sizeof(ret_ptr));
+	*((size_t *)(ret_ptr)) |= 1; /* need to touble check later */
+	current = (void *)((char *)(ret_ptr) + sizeof(ret_ptr));
 	new_alloc = new_alloc - page_size;
 	return ((void *)((char *)(ret_ptr) + aligner(sizeof(chunk_hdr))));
 }
@@ -54,10 +56,8 @@ size_t aligner(size_t size)
 	return ((8 - 1 + size) & ~(8 - 1));
 }
 
-size_t local_max = 0;
-
 /**
- * fit_chunk - find the best fit of heap chunk for allocation 
+ * fit_chunk - find the best fit of heap chunk for allocation
  * @csize: chunk size to fit into the heap
  * @ret_ptr: ptr to the allocated memory, to be returned in main malloc func
  * Return: pointer to the best fit, which is >= the given chunk size
@@ -68,12 +68,13 @@ void *fit_chunk(size_t csize, void *ret_ptr)
 	static size_t max_size;
 	void *next_ptr = NULL;
 
-	if ((*((size_t *)(ret_ptr)) & 1) == NULL && (csize <= ptr_size))
+	if ((*((size_t *)(ret_ptr)) & 1) == 0 && (csize <= ptr_size))
 	{
 		if (local_max == ptr_size)
 			fitflag = 1;
-		max_size = ptr_size, memcpy(ptr_size, &csize, sizeof(csize));
-		ret_ptr = *((size_t *)(ret_ptr)) |= 1;
+		max_size = ptr_size;
+		memcpy(ret_ptr, &csize, sizeof(csize));
+		*((size_t *)(ret_ptr)) |= 1;
 		if (csize < max_size && (max_size - csize) > 8)
 		{
 			next_ptr = (void *)((char *)(ret_ptr) + sizeof(ret_ptr)), max_size -= csize;
