@@ -4,6 +4,11 @@
 #include <unistd.h>
 #include <string.h>
 
+typedef struct sizet_ctrler {
+        size_t left;
+        size_t right;
+} ctrl_t;
+
 void *naive_malloc(size_t size);
 void *_malloc(size_t size);
 void _free(void *ptr);

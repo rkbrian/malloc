@@ -10,11 +10,12 @@ size_t local_max = 0;
  */
 void *_malloc(size_t size)
 {
-	size_t chunk_hdr = aligner(size + sizeof(size_t));
+	size_t chunk_hdr = aligner(size + 2 * sizeof(size_t));
 	static size_t new_alloc;
 	char *ret_ptr;
 	static char *headptr, *current;
 	static long page_size;
+	ctrl_t *controller;
 
 	if (!size)
 		return (NULL);
@@ -38,11 +39,11 @@ void *_malloc(size_t size)
 		new_alloc = new_alloc + page_size;
 	}
 	ret_ptr = current;
-	/*memcpy(ret_ptr, &chunk_hdr, sizeof(chunk_hdr));*/
-	*((size_t *)(ret_ptr)) = size;
+	controller = (ctrl_t *)ret_ptr;
+	controller->left = size, controller->right = size;
 	current = ret_ptr + chunk_hdr;
 	new_alloc = new_alloc - page_size;
-	return (ret_ptr + sizeof(size_t));
+	return (ret_ptr + sizeof(ctrl_t));
 }
 
 /**

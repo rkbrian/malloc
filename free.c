@@ -6,11 +6,13 @@
  */
 void _free(void *ptr)
 {
-	void *headptr;
+	char *headptr;
+	ctrl_t *controller;
 
 	if (ptr)
 	{
-		headptr = (void *)((char *)(ptr) - aligner(sizeof(size_t)));
-		headptr = (void *)((long int)headptr & ~1L); /* bitmask to clear all bits */
+		headptr = (char *)ptr - sizeof(ctrl_t);
+		controller = (ctrl_t *)headptr;
+		controller->right = 0;
 	}
 }
