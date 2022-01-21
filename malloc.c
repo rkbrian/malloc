@@ -12,8 +12,8 @@ void *_malloc(size_t size)
 {
 	size_t chunk_hdr = aligner(size + sizeof(size_t));
 	static size_t new_alloc;
-	void *ret_ptr;
-	static void *headptr, *current;
+	char *ret_ptr;
+	static char *headptr, *current;
 	static long page_size;
 
 	if (!size)
@@ -38,11 +38,11 @@ void *_malloc(size_t size)
 		new_alloc = new_alloc + page_size;
 	}
 	ret_ptr = current;
-	memcpy(ret_ptr, &chunk_hdr, sizeof(chunk_hdr));
-	*((size_t *)(ret_ptr)) |= 1; /* need to touble check later */
-	current = (void *)((char *)(ret_ptr) + sizeof(ret_ptr));
+	/*memcpy(ret_ptr, &chunk_hdr, sizeof(chunk_hdr));*/
+	*((size_t *)(ret_ptr)) = size;
+	current = ret_ptr + chunk_hdr;
 	new_alloc = new_alloc - page_size;
-	return ((void *)((char *)(ret_ptr) + aligner(sizeof(chunk_hdr))));
+	return (ret_ptr + sizeof(size_t));
 }
 
 /**
