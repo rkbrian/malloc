@@ -4,9 +4,15 @@
 #include <unistd.h>
 #include <string.h>
 
-typedef struct sizet_ctrler {
-        size_t left;
-        size_t right;
+/**
+ * struct sizet_ctrler - something
+ * @left: start of size
+ * @right: end of size
+ */
+typedef struct sizet_ctrler
+{
+	size_t left;
+	size_t right;
 } ctrl_t;
 
 void *naive_malloc(size_t size);
